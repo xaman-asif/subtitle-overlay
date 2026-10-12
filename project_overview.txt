@@ -1,0 +1,74 @@
+# Subtitle Overlay – Project Overview
+
+## 📖 What is this?
+A lightweight, transparent subtitle overlay built with **Python 3** and **PyQt6**. It plays audio files, syncs plain‑text subtitles, and lives in the system tray with a 📖 (book) emoji icon. The UI can be toggled with **H**, playback with **Space**, and subtitle text can be copied with **Ctrl +C**.
+
+---
+
+## 🗂 Repository layout
+```
+subtitle-overlay/
+│   overlay.py          # Main application (executable with shebang)
+│   subtitle-overlay.desktop  # Desktop launcher for double‑click execution
+│   README.md (this file)    # Project overview (generated for LLMs)
+│   ... (optional assets)    # e.g. test subtitles, icons
+```
+
+---
+
+## 🔧 Prerequisites
+- **Python ≥ 3.9**
+- **PyQt6** (including QtMultimedia)
+- **dbus‑python** (`dbus-python` package) for MPRIS2 integration
+- **ffmpeg** (Qt multimedia uses it under the hood for audio decoding)
+
+Install the Python dependencies with:
+```bash
+pip install PyQt6 dbus-python
+```
+(Use a virtual environment if you prefer.)
+
+---
+
+## 🚀 Running the app
+### Double‑click (desktop entry)
+1. Ensure `overlay.py` is executable:
+   ```bash
+   chmod +x /home/opi/subtitle-overlay/overlay.py
+   ```
+2. Place the generated `subtitle-overlay.desktop` on your desktop (or in `~/.local/share/applications`).
+3. Double‑click the icon – the overlay window will appear.
+
+### Direct command line
+```bash
+/home/opi/subtitle-overlay/overlay.py /path/to/audio.mp3 /path/to/subtitles.txt
+```
+The script accepts standard `argparse`‑style arguments (future extension point).
+
+---
+
+## 🛠️ Key features
+- **Dynamic font sizing** – subtitles automatically shrink/grow to stay fully visible when the window is resized.
+- **State persistence** – window geometry, opacity, playlist, current track, and playback position are saved in `~/.config/subtitle‑overlay/state.json` and restored on launch.
+- **System‑tray integration** – a tray icon shows a book emoji; clicking toggles the overlay, context menu provides hide/show UI, quit, etc.
+- **Copy‑on‑pause** – when playback is paused, the currently displayed subtitle text is automatically copied to the clipboard.
+- **MPRIS2 support** – works with KDE/KDesktop media controls.
+
+---
+
+## 📦 Packaging notes (for other LLMs)
+- The entry point is the **shebang line** at the top of `overlay.py` (`#!/usr/bin/env python3`).
+- After making the script executable, the `.desktop` file references the absolute path, so no additional wrapper script is required.
+- If you need a portable bundle, you can create a simple zip or AppImage that includes the script, the `.desktop` file, and a `requirements.txt` with the dependencies.
+
+---
+
+## 🛎️ Extensibility ideas
+- Add support for other subtitle formats (SRT, VTT).
+- Implement a settings dialog for font/style customisation.
+- Provide a command‑line interface to load a playlist automatically.
+- Enable theme‑aware tray icons (light/dark variants).
+
+---
+
+*Generated for hand‑off to other language models. All paths are absolute for reproducibility.*
