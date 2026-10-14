@@ -394,7 +394,8 @@ class Overlay(QWidget):
 
         opacity_lbl = QLabel('Opacity')
         self._opacity_slider = QSlider(Qt.Orientation.Horizontal)
-        self._opacity_slider.setRange(10, 100)
+        self._opacity_slider.setRange(0, 100)
+        self._opacity_slider.setToolTip('Window background opacity')
         self._opacity_slider.setValue(85)
         self._opacity_slider.setFixedWidth(90)
         self._opacity_slider.valueChanged.connect(self._set_opacity)
@@ -676,11 +677,18 @@ class Overlay(QWidget):
     def _set_opacity(self, value: int):
         self._opacity_val = value
         alpha = round(value * 2.55)
+        # the slider controls the window background (painted in paintEvent); text stays fully opaque
+        self._bg_alpha = alpha
         self.label.setStyleSheet(
-            f'QLabel {{ color: rgba(255,255,255,{alpha}); '
-            f'font-weight: bold; background: transparent; '
-            f'selection-background-color: #2a75d3; selection-color: #ffffff; }}')
+            'QLabel { color: #ffffff; font-weight: bold; background: transparent; '
+            'selection-background-color: #2a75d3; selection-color: #ffffff; }')
+        self.update()
         self._schedule_save()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.fillRect(self.rect(), QColor(0, 0, 0, getattr(self, '_bg_alpha', 217)))
+        painter.end()
 
     def _update_font(self):
         """Adjust subtitle font size to fit the label area."""
