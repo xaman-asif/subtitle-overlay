@@ -353,6 +353,11 @@ class Overlay(QWidget):
         self.playlist_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self._marquee = MarqueeDelegate(self.playlist_widget)
         self.playlist_widget.setItemDelegate(self._marquee)
+        # blue highlight for the current track, also when the window is not focused
+        pal = self.playlist_widget.palette()
+        pal.setColor(QPalette.ColorGroup.All, QPalette.ColorRole.Highlight, QColor('#2a75d3'))
+        pal.setColor(QPalette.ColorGroup.All, QPalette.ColorRole.HighlightedText, QColor('#ffffff'))
+        self.playlist_widget.setPalette(pal)
         self._marquee_timer = QTimer(self)
         self._marquee_timer.timeout.connect(self._marquee.step)
         self._marquee_timer.start(MARQUEE_MS)
@@ -651,7 +656,14 @@ class Overlay(QWidget):
         # recompute the minimum size for the new set of visible widgets before resizing
         self.layout().activate()
         self.resize(*target)
+        if showing:
+            QTimer.singleShot(0, self._scroll_to_current)
         self._schedule_save()
+
+    def _scroll_to_current(self):
+        item = self.playlist_widget.item(self._current_index)
+        if item:
+            self.playlist_widget.scrollToItem(item, QListWidget.ScrollHint.PositionAtCenter)
 
     # ── window toggle (tray) ──
     def _toggle_window(self):
@@ -737,6 +749,8 @@ class Overlay(QWidget):
             return
         self._current_index = index
         self.playlist_widget.setCurrentRow(index)
+        # deferred so it also works before the window is first shown
+        QTimer.singleShot(0, self._scroll_to_current)
         path = self._playlist[index]
         self.setWindowTitle(path.name)
         self._cues = []
